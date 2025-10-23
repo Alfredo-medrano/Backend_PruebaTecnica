@@ -13,9 +13,9 @@ Este repositorio contiene la implementación del **Backend (API RESTful)** para 
 
 ## 💻 Stack Tecnológico 
 
-El Backend está construido sobre **Laravel 12 (PHP)**, cumpliendo los criterios de evaluación.
+El Backend está construido sobre **Laravel 12 (PHP)**.
 
-| Criterio | Tecnología / Implementación | Justificación (Buenas Prácticas) |
+| Criterio | Tecnología / Implementación | Buenas Prácticas |
 | :--- | :--- | :--- |
 | **Framework** | **Laravel 12 (PHP 8.2)** | Servidor API RESTful. |
 | **Autenticación** | **JWT** (`tymondesigns/jwt-auth`) | Uso de Tokens Bearer para acceso protegido. |
@@ -32,7 +32,7 @@ El Backend está construido sobre **Laravel 12 (PHP)**, cumpliendo los criterios
 ### Requisitos Previos
 * PHP (8.2 o superior)
 * Composer
-* MySQL Server (o SQLite)
+* MySQL Server 
 
 ### Pasos
 
