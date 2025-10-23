@@ -11,29 +11,28 @@
 
 Este repositorio contiene la implementación del **Backend (API RESTful)** para la prueba técnica de Full Stack Jr/Pasantía. El proyecto permite a los usuarios registrarse, autenticarse y gestionar de forma segura **solo sus tareas personales**.
 
-## 💻 Stack Tecnológico y Criterios Cumplidos
+## 💻 Stack Tecnológico 
 
-El Backend está construido sobre el siguiente stack tecnológico, enfocándose en los criterios de evaluación:
+El Backend está construido sobre **Laravel 12 (PHP)**.
 
-| Criterio | Tecnología / Implementación | Notas |
+| Criterio | Tecnología / Implementación | Buenas Prácticas |
 | :--- | :--- | :--- |
-| **Framework** | **Laravel 12 (PHP)** | Servidor API RESTful. |
+| **Framework** | **Laravel 12 (PHP 8.2)** | Servidor API RESTful. |
 | **Autenticación** | **JWT** (`tymondesigns/jwt-auth`) | Uso de Tokens Bearer para acceso protegido. |
-| **Base de Datos** | **MySQL** | Base de datos relacional para persistencia. |
-| **Buenas Prácticas** | **Request Classes** | Validación de datos separada y limpia (ej. email único, contraseñas). |
-| **Autorización** | **Relaciones Eloquent** | [cite_start]Lógica implementada para que el usuario solo acceda a **sus propias tareas** (Ver solo sus propias tareas [cite: 9]). |
-| **Seguridad** | **Mass Assignment Prevention** | Uso de `$fillable` en Modelos. |
+| **Arquitectura** | **Service Layer** | Lógica de negocio separada en `AuthService` y `TaskService` para controladores limpios. |
+| **Validación** | **Form Requests** | Uso de clases Request (ej. `RegisterRequest`) para validación limpia antes de la ejecución del controlador. |
+| **Autorización** | **Relaciones Eloquent** | Lógica implementada para que el usuario solo acceda a **sus propias tareas**. |
+| **Seguridad** | **JWT Blacklist** | El token se invalida explícitamente al cerrar sesión (`POST /logout`). |
 
 ---
 
 ## 🚀 Instalación y Pasos para Correr el Proyecto
 
-[cite_start]Esta sección cumple con el requisito de [Incluir un archivo README.md con instrucciones para levantar el backend. [cite: 25]]
 
 ### Requisitos Previos
 * PHP (8.2 o superior)
 * Composer
-* MySQL Server
+* MySQL Server 
 
 ### Pasos
 
@@ -64,12 +63,18 @@ El Backend está construido sobre el siguiente stack tecnológico, enfocándose 
     ```
 
 4.  **Ejecutar Migraciones**
-    [cite_start]Esto creará las tablas `users` [cite: 20] [cite_start]y `tasks` [cite: 21] con las claves foráneas necesarias.
+    Esto creará las tablas `users` y `tasks` con las claves foráneas necesarias.
     ```bash
     php artisan migrate
     ```
 
-5.  **Iniciar el Servidor**
+5.  **Ejecutar Tests (Calidad Técnica)**
+    Se incluye un conjunto completo de pruebas de integración (`AuthTest.php`, `TaskTest.php`).
+    ```bash
+    php artisan test
+    ```
+
+6.  **Iniciar el Servidor**
     ```bash
     php artisan serve
     ```
@@ -77,36 +82,30 @@ El Backend está construido sobre el siguiente stack tecnológico, enfocándose 
 
 ---
 
-## 🔑 Credenciales de Prueba (Para Evaluación)
+## 🔑 Credenciales de Prueba 
 
-Utilice estas credenciales de prueba o regístrese a través de `/api/register`.
+Utilice estas credenciales o regístrese a través de `/api/register`.
 
 | Campo | Valor |
 | :--- | :--- |
 | **Email** | `tester@gmail.com` |
-| **Contraseña** | `password123` |
+| **Contraseña** | `password123!` |
+
+*Nota: La contraseña incluye un símbolo para cumplir con las validaciones de seguridad.*
 
 ## 🔗 Endpoints de la API (Para Integración Frontend)
 
-Todos los *endpoints* están prefijados con `/api/`.
-
-### 1. Autenticación (Rutas Abiertas)
+Todas las rutas están prefijadas con `/api/`. Las rutas protegidas requieren el **Token JWT** en la cabecera `Authorization: Bearer [TOKEN]`.
 
 | Método | Endpoint | Requisito | Descripción |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/register` | No | [cite_start]Crea un nuevo usuario. [cite: 13] |
-| `POST` | `/api/login` | No | [cite_start]Autentica y devuelve el token JWT. [cite: 14] |
-
-### 2. Tareas (Rutas Protegidas)
-
-Estas rutas requieren el **Token JWT** en la cabecera `Authorization: Bearer [TOKEN]`.
-
-| Método | Endpoint | Requisito | Descripción |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/tasks` | Sí | [cite_start]Listar tareas del usuario autenticado. [cite: 15] |
-| `POST` | `/api/tasks` | Sí | [cite_start]Crear una nueva tarea. [cite: 16] |
-| `PUT` | `/api/tasks/{id}` | Sí | [cite_start]Editar tarea. [cite: 17] [cite_start]Autorización para **solo sus propias tareas**[cite: 9]. |
-| `DELETE` | `/api/tasks/{id}` | Sí | [cite_start]Eliminar tarea. [cite: 18] [cite_start]Autorización para **solo sus propias tareas**[cite: 9]. |
+| `POST` | `/api/register` | Público | Crea un nuevo usuario. |
+| `POST` | `/api/login` | Público | Autentica y devuelve el token JWT. |
+| `POST` | `/api/logout` | Protegido | Invalida el token JWT. |
+| `GET` | `/api/tasks` | Protegido | Lista tareas del usuario autenticado. |
+| `POST` | `/api/tasks` | Protegido | Crea una nueva tarea. |
+| `PUT/PATCH`| `/api/tasks/{id}` | Protegido | Edita una tarea del usuario. |
+| `DELETE` | `/api/tasks/{id}` | Protegido | Elimina una tarea del usuario. |
 
 ---
 
