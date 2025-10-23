@@ -7,46 +7,108 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+# 📘 Gestor de Tareas (To-Do App) - Backend API
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Este repositorio contiene la implementación del **Backend (API RESTful)** para la prueba técnica de Full Stack Jr/Pasantía. El proyecto permite a los usuarios registrarse, autenticarse y gestionar de forma segura **solo sus tareas personales**.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 💻 Stack Tecnológico y Criterios Cumplidos
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+El Backend está construido sobre el siguiente stack tecnológico, enfocándose en los criterios de evaluación:
 
-## Learning Laravel
+| Criterio | Tecnología / Implementación | Notas |
+| :--- | :--- | :--- |
+| **Framework** | **Laravel 12 (PHP)** | Servidor API RESTful. |
+| **Autenticación** | **JWT** (`tymondesigns/jwt-auth`) | Uso de Tokens Bearer para acceso protegido. |
+| **Base de Datos** | **MySQL** | Base de datos relacional para persistencia. |
+| **Buenas Prácticas** | **Request Classes** | Validación de datos separada y limpia (ej. email único, contraseñas). |
+| **Autorización** | **Relaciones Eloquent** | [cite_start]Lógica implementada para que el usuario solo acceda a **sus propias tareas** (Ver solo sus propias tareas [cite: 9]). |
+| **Seguridad** | **Mass Assignment Prevention** | Uso de `$fillable` en Modelos. |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 🚀 Instalación y Pasos para Correr el Proyecto
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+[cite_start]Esta sección cumple con el requisito de [Incluir un archivo README.md con instrucciones para levantar el backend. [cite: 25]]
 
-## Laravel Sponsors
+### Requisitos Previos
+* PHP (8.2 o superior)
+* Composer
+* MySQL Server
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Pasos
 
-### Premium Partners
+1.  **Clonar y Dependencias**
+    ```bash
+    git clone [https://aws.amazon.com/es/what-is/repo/](https://aws.amazon.com/es/what-is/repo/) vitrinnea-backend
+    cd vitrinnea-backend
+    composer install
+    ```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+2.  **Configuración de Entorno y Claves**
+    ```bash
+    cp .env.example .env
+    php artisan key:generate
+    php artisan jwt:secret
+    ```
 
-## Contributing
+3.  **Configuración de Base de Datos**
+    Edite el archivo `.env` con sus credenciales de MySQL y **cree la base de datos** antes de migrar.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+    ```dotenv
+    DB_CONNECTION=mysql
+    DB_HOST=127.0.0.1
+    DB_PORT=3306
+    DB_DATABASE=vitrinnea_tasks_db 
+    DB_USERNAME=root
+    DB_PASSWORD=
+    ```
+
+4.  **Ejecutar Migraciones**
+    [cite_start]Esto creará las tablas `users` [cite: 20] [cite_start]y `tasks` [cite: 21] con las claves foráneas necesarias.
+    ```bash
+    php artisan migrate
+    ```
+
+5.  **Iniciar el Servidor**
+    ```bash
+    php artisan serve
+    ```
+    El Backend estará disponible en `http://127.0.0.1:8000`.
+
+---
+
+## 🔑 Credenciales de Prueba (Para Evaluación)
+
+Utilice estas credenciales de prueba o regístrese a través de `/api/register`.
+
+| Campo | Valor |
+| :--- | :--- |
+| **Email** | `tester@vitrinnea.com` |
+| **Contraseña** | `password123` |
+
+## 🔗 Endpoints de la API (Para Integración Frontend)
+
+Todos los *endpoints* están prefijados con `/api/`.
+
+### 1. Autenticación (Rutas Abiertas)
+
+| Método | Endpoint | Requisito | Descripción |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/api/register` | No | [cite_start]Crea un nuevo usuario. [cite: 13] |
+| `POST` | `/api/login` | No | [cite_start]Autentica y devuelve el token JWT. [cite: 14] |
+
+### 2. Tareas (Rutas Protegidas)
+
+Estas rutas requieren el **Token JWT** en la cabecera `Authorization: Bearer [TOKEN]`.
+
+| Método | Endpoint | Requisito | Descripción |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/tasks` | Sí | [cite_start]Listar tareas del usuario autenticado. [cite: 15] |
+| `POST` | `/api/tasks` | Sí | [cite_start]Crear una nueva tarea. [cite: 16] |
+| `PUT` | `/api/tasks/{id}` | Sí | [cite_start]Editar tarea. [cite: 17] [cite_start]Autorización para **solo sus propias tareas**[cite: 9]. |
+| `DELETE` | `/api/tasks/{id}` | Sí | [cite_start]Eliminar tarea. [cite: 18] [cite_start]Autorización para **solo sus propias tareas**[cite: 9]. |
+
+---
 
 ## Code of Conduct
 
