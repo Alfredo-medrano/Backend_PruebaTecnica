@@ -38,7 +38,7 @@ El Backend está construido sobre **Laravel 12 (PHP)**.
 
 1.  **Clonar y Dependencias**
     ```bash
-    git clone [https://github.com/Alfredo-medrano/Backend_PruebaTecnica.git](https://github.com/Alfredo-medrano/Backend_PruebaTecnica.git)
+    git clone https://github.com/Alfredo-medrano/Backend_PruebaTecnica.git
     cd Backend_PruebaTecnica
     npm install & npm run build
     ```
