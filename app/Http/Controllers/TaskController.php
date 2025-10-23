@@ -2,61 +2,82 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Task;
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
+use App\Http\Resources\TaskResource; // Importamos el Resource
+use App\Services\TaskService; // Importamos el Servicio
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\JsonResource; // Para el tipo de retorno
 
 class TaskController extends Controller
 {
+    // Inyección de dependencias del servicio
+    public function __construct(protected TaskService $taskService)
+    {
+    }
 
     /**
-     * GET /api/tasks lista las tareas del usuario autenticado.
+     * GET /api/tasks
+     * Muestra la lista de tareas del usuario.
      */
-    public function index()
+    public function index(): JsonResource
     {
-        $tasks = Auth::user()->tasks()->orderBy('created_at', 'desc')->get();
+        $tasks = $this->taskService->getTasksForUser(Auth::user());
         
-        return response()->json($tasks);
+        // Usamos el Resource para formatear la colección
+        return TaskResource::collection($tasks);
     }
 
     /**
-     * POST /api/tasks crea una nueva tarea.
+     * POST /api/tasks
+     * Crea una nueva tarea.
      */
-    public function store(StoreTaskRequest $request)
+    public function store(StoreTaskRequest $request): JsonResponse
     {
-        // El user_id se asigna automáticamente usando la relación.
-        $task = Auth::user()->tasks()->create($request->validated());
+        $task = $this->taskService->createTask(Auth::user(), $request->validated());
 
-        return response()->json([
-            'message' => 'Tarea creada exitosamente',
-            'task' => $task
-        ], 201); 
+        // Devolvemos el nuevo recurso usando el Resource y un código 201
+        return (new TaskResource($task))
+                ->response()
+                ->setStatusCode(201);
     }
 
     /**
-     * PUT /api/tasks/{id} edita una tarea.
+     * GET /api/tasks/{id}
+     * Muestra una tarea específica.
      */
-    public function update(UpdateTaskRequest $request, string $id)
+    public function show(string $id): TaskResource
     {
-        $task = Auth::user()->tasks()->findOrFail($id); 
-        $task->update($request->validated());
-
-        return response()->json([
-            'message' => 'Tarea actualizada exitosamente',
-            'task' => $task
-        ]);
+        // El servicio buscará la tarea y lanzará 404 si no existe
+        // o no pertenece al usuario.
+        $task = $this->taskService->findTaskForUser(Auth::user(), $id);
+        
+        return new TaskResource($task);
     }
-    
-    /**
-     * DELETE /api/tasks/{id} elimina una tarea.
-     */
-    public function destroy(string $id)
-    {
-        $task = Auth::user()->tasks()->findOrFail($id);
-        $task->delete();
 
-        return response()->json(null, 204); 
+    /**
+     * PUT /api/tasks/{id}
+     * Actualiza una tarea.
+     */
+    public function update(UpdateTaskRequest $request, string $id): TaskResource
+    {
+        // El servicio buscará y actualizará. Lanzará 404 si es necesario.
+        $task = $this->taskService->updateTask(Auth::user(), $id, $request->validated());
+
+        return new TaskResource($task);
+    }
+
+    /**
+     * DELETE /api/tasks/{id}
+     * Elimina una tarea.
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        // El servicio buscará y eliminará.
+        $this->taskService->deleteTask(Auth::user(), $id);
+
+        // Devolvemos una respuesta vacía con código 204
+        return response()->json(null, 204);
     }
 }

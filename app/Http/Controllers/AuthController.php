@@ -2,57 +2,55 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\RegisterRequest;
-use App\Models\User;
+use App\Services\AuthService; 
+use Illuminate\Http\Request;
 use Tymon\JWTAuth\Facades\JWTAuth;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-
+use Illuminate\Http\JsonResponse; 
 
 class AuthController extends Controller
 {
-    //
-    public function register(RegisterRequest $request)
+    // Inyección de dependencias del servicio
+    public function __construct(protected AuthService $authService)
     {
-        $user = User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => Hash::make($request->input('password')),
-        ]);
+    }
 
-        /*
-        Generar el token JWT para el usuario registrado
-        */
-        $token = JWTAuth::fromUser($user);
+    /**
+     * Registra un nuevo usuario.
+     */
+    public function register(RegisterRequest $request): JsonResponse
+    {
+        $result = $this->authService->registerUser($request->validated());
 
         return response()->json([
             'message' => 'Usuario registrado y autenticado con exito',
-            'user' => $user,
-            'token' => $token,
+            'user' => $result['user'], 
+            'token' => $result['token'], 
         ], 201);
     }
 
-   public function login(Request $request)
+    /**
+     * Autentica un usuario y devuelve un token.
+     */
+    public function login(Request $request): JsonResponse
     {
-       $credentials = $request->validate([
-           'email' => 'required|email',
-           'password' => 'required|string|min:8',
-       ]);
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required|string',
+        ]);
 
-        /*
-           Intentar autenticar al usuario y generar el token JWT
-        */
-          if (! $token = JWTAuth::attempt($credentials)) {
-              return response()->json(['error' => 'Credenciales invalidas'], 401);
-          }
+        // Delegamos la lógica al servicio
+        $token = $this->authService->attemptLogin($credentials);
 
+        if (!$token) {
+            return response()->json(['error' => 'Credenciales invalidas'], 401);
+        }
 
-          
-           return response()->json([
-               'token' => $token,
-               'token_type' => 'bearer',
-               'expires_in' => JWTAuth::factory()->getTTL() * 60 
-           ], 200);
+        // Si hay token, lo devolvemos
+        return response()->json([
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => JWTAuth::factory()->getTTL() * 60
+        ], 200);
     }
 }

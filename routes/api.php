@@ -5,17 +5,18 @@ use App\Http\Controllers\TaskController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// Rutas de autenticación con límite de 60 peticiones por minuto
 
-Route::controller(AuthController::class)->group(function () {
+Route::controller(AuthController::class)->middleware('throttle:60,1')->group(function () {
     Route::post('/register', 'register');
     Route::post('/login', 'login');
 });
 
-// Rutas Protegidas por JWT 
-Route::middleware('auth:api')->group(function () {
+// Rutas Protegidas por JWT y limitadas a 100 peticiones por minuto
+Route::middleware(['auth:api', 'throttle:100,1'])->group(function () {
     
-    // Route::apiResource para crear las rutas RESTful estándar (index, store, update, destroy)
+    // Usamos apiResource y añadimos 'show'
     Route::apiResource('tasks', TaskController::class)->only([
-        'index', 'store', 'update', 'destroy'
+        'index', 'store', 'show', 'update', 'destroy'
     ]);
 });

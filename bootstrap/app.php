@@ -3,6 +3,11 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Auth\AuthenticationException;
+
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,22 +16,34 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
-        // 1. Configuración del grupo 'api' para evitar Rate Limiting (Throttle)
-        // Esto anula la configuración por defecto que podría estar causando el 403.
-        $middleware->api(prepend: [
-            // Aquí puede añadir el middleware de CORS si es necesario (ej: \Fruitcake\Cors\HandleCors::class)
-            // Pero para las pruebas iniciales, lo dejamos limpio para evitar más conflictos.
-        ]);
-
-        // 2. Agregar alias para JWT
-        // Esto asegura que el middleware 'auth:api' que usa en routes/api.php
-        // apunte correctamente a la clase de autenticación de JWT.
+    ->withMiddleware(function (Middleware $middleware) {
+        
         $middleware->alias([
             'auth:api' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
+    ->withExceptions(function (Exceptions $exceptions) {
+        
+        //captura los ModelNotFoundException y devuelve un JSON 404
+        $exceptions->renderable(function (ModelNotFoundException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Recurso no encontrado.'], 404);
+            }
+        });
+
+        // captura los 404 de rutas no encontradas
+        $exceptions->renderable(function (NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'Ruta no encontrada.'], 404);
+            }
+        });
+
+        // Esto captura los 401 de 'auth:api' (token inválido o ausente)
+        $exceptions->renderable(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json(['message' => 'No autenticado.'], 401);
+            }
+        });
+        // --- FIN DE CÓDIGO AÑADIDO ---
+
     })->create();
