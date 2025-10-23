@@ -14,6 +14,7 @@ Route::controller(AuthController::class)->middleware('throttle:60,1')->group(fun
 
 // Rutas Protegidas por JWT y limitadas a 100 peticiones por minuto
 Route::middleware(['auth:api', 'throttle:100,1'])->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
     
     // Usamos apiResource y añadimos 'show'
     Route::apiResource('tasks', TaskController::class)->only([

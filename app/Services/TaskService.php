@@ -34,7 +34,7 @@ class TaskService
 
     /**
      * Encuentra una tarea específica que pertenece a un usuario.
-     * Lanzará ModelNotFoundException si no se encuentra (que será capturada globalmente).
+     * Lanzará ModelNotFoundException si no se encuentra
      *
      * @param User $user
      * @param string $id

@@ -19,7 +19,7 @@ class TaskResource extends JsonResource
             'id' => $this->id,
             'titulo' => $this->title,
             'descripcion' => $this->description,
-            'completada' => $this->is_completed, // El modelo se encargará de castearlo a boolean
+            'completada' => $this->is_completed,
             'creada_en' => $this->created_at->toIso8601String(),
             'actualizada_en' => $this->updated_at->toIso8601String(),
         ];

@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskRequest;
 use App\Http\Requests\UpdateTaskRequest;
-use App\Http\Resources\TaskResource; // Importamos el Resource
-use App\Services\TaskService; // Importamos el Servicio
+use App\Http\Resources\TaskResource; 
+use App\Services\TaskService; 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Resources\Json\JsonResource; // Para el tipo de retorno
+use Illuminate\Http\Resources\Json\JsonResource; 
 
 class TaskController extends Controller
 {
@@ -49,8 +49,7 @@ class TaskController extends Controller
      */
     public function show(string $id): TaskResource
     {
-        // El servicio buscará la tarea y lanzará 404 si no existe
-        // o no pertenece al usuario.
+        // El servicio buscará la tarea y lanzará 404 si no existe o no pertenece al usuario.
         $task = $this->taskService->findTaskForUser(Auth::user(), $id);
         
         return new TaskResource($task);

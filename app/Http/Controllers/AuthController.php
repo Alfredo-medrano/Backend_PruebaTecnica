@@ -46,11 +46,29 @@ class AuthController extends Controller
             return response()->json(['error' => 'Credenciales invalidas'], 401);
         }
 
-        // Si hay token, lo devolvemos
+        // Si hay token lo devolvemos
         return response()->json([
             'token' => $token,
             'token_type' => 'bearer',
             'expires_in' => JWTAuth::factory()->getTTL() * 60
         ], 200);
+    }
+
+    public function logout(): JsonResponse
+    {
+        try {
+            // Invalida el token que se envió en la petición
+            JWTAuth::invalidate(JWTAuth::getToken());
+
+            return response()->json([
+                'message' => 'Sesión cerrada con exito. Token invalidado.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Esto captura errores si el token no se pudo invalidar (ej. ya estaba invalidado)
+            return response()->json([
+                'message' => 'Ocurrió un error al cerrar la sesión o el token ya es inválido.'
+            ], 500);
+        }
     }
 }
