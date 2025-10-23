@@ -39,9 +39,9 @@ El Backend está construido sobre el siguiente stack tecnológico, enfocándose 
 
 1.  **Clonar y Dependencias**
     ```bash
-    git clone [https://aws.amazon.com/es/what-is/repo/](https://aws.amazon.com/es/what-is/repo/) vitrinnea-backend
-    cd vitrinnea-backend
-    composer install
+    git clone https://github.com/Alfredo-medrano/Backend_PruebaTecnica.git
+    cd Backend_PruebaTecnica
+    npm install & npm run build
     ```
 
 2.  **Configuración de Entorno y Claves**
@@ -58,9 +58,9 @@ El Backend está construido sobre el siguiente stack tecnológico, enfocándose 
     DB_CONNECTION=mysql
     DB_HOST=127.0.0.1
     DB_PORT=3306
-    DB_DATABASE=vitrinnea_tasks_db 
+    DB_DATABASE=PruebaTecnica 
     DB_USERNAME=root
-    DB_PASSWORD=
+    DB_PASSWORD=root
     ```
 
 4.  **Ejecutar Migraciones**
@@ -83,7 +83,7 @@ Utilice estas credenciales de prueba o regístrese a través de `/api/register`.
 
 | Campo | Valor |
 | :--- | :--- |
-| **Email** | `tester@vitrinnea.com` |
+| **Email** | `tester@gmail.com` |
 | **Contraseña** | `password123` |
 
 ## 🔗 Endpoints de la API (Para Integración Frontend)
