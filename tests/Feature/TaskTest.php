@@ -30,9 +30,9 @@ class TaskTest extends TestCase
         return $token;
     }
 
-    //---------------------------------------------------------
-    // PRUEBAS DE SEGURIDAD (Unauthorized)
-    //---------------------------------------------------------
+    
+    // Pruebas de seguridad no autorizado
+    
 
     /**
      * Todos los endpoints de tareas requieren autenticación (401).
@@ -50,9 +50,9 @@ class TaskTest extends TestCase
         $this->deleteJson('/api/tasks/' . $task->id)->assertStatus(401);
     }
 
-    //---------------------------------------------------------
-    // PRUEBAS CRUD
-    //---------------------------------------------------------
+    
+    // Pruebas CRUD
+    
 
     /**
      * Un usuario puede crear una tarea (201).
